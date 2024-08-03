@@ -88,7 +88,7 @@ def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, 
 # Run a nested sampling algorithm (Skilling 2004)
 def nested_sampling(data, N, prior_low, prior_high, scale):
 
-    #Initialize algorithm
+    # Sample 'successive prior ratios' distribution
     samps=100000
     chain_t = sample_prob_t(N, samps, 0.01)
 
@@ -158,8 +158,8 @@ def nested_sampling(data, N, prior_low, prior_high, scale):
 
         # Accumulate evidence
         weight = prior_volumes[-2] - prior_volumes[-1]
-        lowest_likelihood = np.exp(sorted_likelihoods[0])
-        evidence_contrib = lowest_likelihood * weight
+        lowest_nonlog_likelihood = np.exp(sorted_likelihoods[0])
+        evidence_contrib = lowest_nonlog_likelihood * weight
         evidence_layers = np.append(evidence_layers, evidence_contrib)
 
         # Stopping criterion
@@ -212,5 +212,8 @@ ax1.set_ylabel('y')
 xtest = np.linspace(0,10,100)
 ytest = best_fit[0] + (best_fit[1]*xtest)
 ax1.plot(xtest, ytest, color='red')
+ax1.set_title(f'$f(x) = ({best_fit[0].round(2)}) + ({best_fit[1].round(2)})x$')
+
 
 plt.show()
+

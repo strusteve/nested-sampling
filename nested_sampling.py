@@ -165,7 +165,7 @@ def nested_sampling(data, N, prior_low, prior_high, scale):
         # Stopping criterion
         max_contrib = np.exp(sorted_likelihoods[-1]) * weight
         log_max_contrib_ratio = np.log(max_contrib) - np.log(np.sum(evidence_layers))
-        print(log_max_contrib_ratio)
+        print(f'Remaining log-evidence: {log_max_contrib_ratio}')
 
         if log_max_contrib_ratio < 0.1:
             # Return the posterior

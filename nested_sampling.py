@@ -21,12 +21,12 @@ def log_likelihood(data,  params, scale):
     
     return(log_l_total)
 
-# Distribution of succesive prior volume ratios (i.e the probability distribution for the largest of N samples drawn uniformly from the interval [0, 1])
+# Distribution of successive prior volume ratios (i.e the probability distribution for the largest of N samples drawn uniformly from the interval [0, 1])
 def prob_t(t, N):
     log_p = np.log(N) + ((N-1) * np.log(t))
     return log_p
 
-# Sample the distribution of succesive prior volume ratios
+# Sample the distribution of successive prior volume ratios via metropolis-hastings MCMC
 def sample_prob_t(N, samps, stepsize):
 
     t_init = 0.9

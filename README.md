@@ -19,7 +19,7 @@ Refinements to be made:
 
 ### Nested Sampling
 
-Summary: Starts from N positions in parameter space, replaces the lowest likelihood position with a higher likelihood position sampled from a likelihood-bounded prior. This process iterates, accumulating bayesian evidence at each 'layer' until only a negligible amount is left. Discarded points represent posterior samples and through the evidence posterior values for each are calculated.
+Summary: Starts from N positions in parameter space, replaces the lowest likelihood position with a higher likelihood position sampled from a likelihood-bounded prior. This process iterates, accumulating bayesian evidence at each 'layer' until only a negligible amount is left. Discarded positions represent posterior samples and posterior values for each are calculated via the evidence.
 
 Input: data with errors on y, generative function, number of samples, lower prior bounds, upper prior bounds, likelihood scaling factor
 

@@ -1,6 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Normal distribution
+def normal(x, loc, sigma):
+    y = (1 / (sigma * np.sqrt(2*np.pi))) * (np.exp (-0.5 * ((x - loc)/sigma)**2) )
+    return y
+
 # Generative function to be fit
 def f(x, par):
     y = par[0] + (par[1]*x)

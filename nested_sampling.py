@@ -94,7 +94,7 @@ def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, 
             chain = np.vstack((chain, trial_point))
             accepted += 1
         else:
-            chain = np.vstack((chain, trial_point))
+            chain = np.vstack((chain, current_point))
             rejected += 1
 
     return chain[-1], accepted, rejected

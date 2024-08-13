@@ -60,6 +60,7 @@ def metropolis_hastings(data, gen_func, guess, stepsizes, N, scale):
 
     return clean_chain
 
+# Main function for running & plotting MH
 def run_metropolis_hastings(data, gen_func, guess, stepsizes, N, scale):
 
     # Run MH algorithm for a Markov Chain

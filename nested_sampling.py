@@ -72,15 +72,27 @@ def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, 
         trial_point = np.zeros(len(current_point))
         for j in range(len(trial_point)):
             trial_point[j] = np.random.normal(current_point[j], sigmas[j])
-
         trial_likelihood = log_likelihood(data, trial_point, scale)
 
-        if trial_likelihood > sorted_likelihoods[0]:
+        #Calculate priors
+        current_prior = np.product(normal(current_point, current_point, sigmas))
+        trial_prior = np.product(normal(trial_point, current_point, sigmas))
+
+        #Acceptance ratio
+        if trial_likelihood >= sorted_likelihoods[0]:
+            alpha = min(1, trial_prior/current_prior)
+        else:
+            alpha = 0
+            
+        # Generate random number from 0-1
+        mu = np.random.random_sample()
+
+        #Accept or reject step (kept in logarithm due to underflow errors)
+        if (mu < alpha):
             chain = np.vstack((chain, trial_point))
             accepted += 1
-        
         else:
-            chain = np.vstack((chain, current_point))
+            chain = np.vstack((chain, trial_point))
             rejected += 1
 
     return chain[-1], accepted, rejected

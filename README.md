@@ -25,7 +25,7 @@ Input: data with errors on y, generative function, number of samples, lower prio
 
 Notes:
 - Returns bayesian evidence as well as posterior samples
-- In sampling a likelihood-bounded prior, uses uniform priors (explicitly) and symmetric proposal distributions
+- In sampling a likelihood-bounded prior, uses uniform priors (explicitly) and symmetric proposal distributions in a Metropolis algorithm
 - Uses variable stepsizes in a self-contained metropolis algorithm
 
 Refinements to be made:

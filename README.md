@@ -5,7 +5,7 @@ Fit functions to data using:<br /><br /> (1) A Monte-Carlo Markov Chain, specifi
 
 ### Metropolis-Hastings
 
-Summary: Starts from an initial position in parameter space, then uses proposal distributions to move around in parameter space. Moves are accepted based on an acceptance probability, calculated from posterior and proposal distribution ratios for the old and new step. Stops after a certain amount of (specified) iterations. 
+Summary: Starts from an initial position in parameter space, then uses proposal distributions to move around in parameter space. Moves are accepted based on an acceptance probability, calculated from posterior and proposal distribution ratios for the old and new steps. Stops after a certain amount of (specified) iterations. 
 
 Input: data with errors on y, generative function, initial guess, stepsizes, number of iterations, likelihood scaling factor
 

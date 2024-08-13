@@ -1,11 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Normal distribution
-def normal(x, loc, sigma):
-    y = (1 / (sigma * np.sqrt(2*np.pi))) * (np.exp (-0.5 * ((x - loc)/sigma)**2) )
-    return y
-
 # Generative function to be fit
 def f(x, par):
     y = par[0] + (par[1]*x)
@@ -34,8 +29,10 @@ def prob_t(t, N):
 # Sample the distribution of successive prior volume ratios via metropolis-hastings MCMC
 def sample_prob_t(N, samps, stepsize):
 
+    # Uniform prior for guesses
     t_init = 0.9
-
+    
+    # Initialise markov chain
     chain = np.array(([t_init]))
     accepted = 0
 
@@ -48,12 +45,13 @@ def sample_prob_t(N, samps, stepsize):
             new_t = current_t
 
         new_p = prob_t(new_t, N)
-    
-        prob_ratio = new_p - current_p
+
+        # Calculate acceptance ratio (NB symmetric proposal distributions)
+        posterior_ratio = new_p - current_p
         mu = np.random.uniform(0,1)
 
         #Accept or reject step (kept in logarithm due to underflow errors)
-        if (np.log(mu) < min(np.log(1), prob_ratio)):
+        if (np.log(mu) < min(np.log(1), posterior_ratio)):
             chain = np.vstack((chain, new_t))
             accepted += 1
         else:
@@ -61,7 +59,7 @@ def sample_prob_t(N, samps, stepsize):
 
     return chain.flatten()
 
-# Sample a likelihood bounded prior via the metropolis algorithm (Feroz 2008 Section 6)
+# Sample a likelihood bounded prior via the metropolis algorithm (adapted from Feroz 2008 Section 6)
 def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, scale):
 
     likelier_point = sorted_prior_samples[1:][np.random.randint(0, N-1)]
@@ -79,13 +77,12 @@ def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, 
             trial_point[j] = np.random.normal(current_point[j], sigmas[j])
         trial_likelihood = log_likelihood(data, trial_point, scale)
 
-        #Calculate priors
-        current_prior = np.product(normal(current_point, current_point, sigmas))
-        trial_prior = np.product(normal(trial_point, current_point, sigmas))
+        #Calculate prior ratio (NB uniform priors)
+        prior_ratio = 1 #Included here for completeness
 
-        #Acceptance ratio
-        if trial_likelihood >= sorted_likelihoods[0]:
-            alpha = min(1, trial_prior/current_prior)
+        #Acceptance ratio (NB symmetric proposal distributions)
+        if trial_likelihood > sorted_likelihoods[0]:
+            alpha = min(1, prior_ratio)
         else:
             alpha = 0
             
@@ -101,6 +98,7 @@ def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, 
             rejected += 1
 
     return chain[-1], accepted, rejected
+
 
 # Run a nested sampling algorithm (Skilling 2004, Feroz 2008)
 def nested_sampling(data, N, prior_low, prior_high, scale):

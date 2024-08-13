@@ -198,7 +198,8 @@ samples, likelihood, evidence, priors = nested_sampling(data, N, prior_low, prio
 # Compute the posterior and best fit model (MAP values)
 posterior = evidence / np.sum(evidence)
 best_fit = samples[np.argmax(posterior)]
-print(best_fit)
+uncertainties = samples.T.std(1)
+
 
 # Plot results
 fig, (ax, ax1) = plt.subplots(1, 2, figsize=(10,3))
@@ -212,7 +213,7 @@ ax1.set_ylabel('y')
 xtest = np.linspace(0,10,100)
 ytest = best_fit[0] + (best_fit[1]*xtest)
 ax1.plot(xtest, ytest, color='red')
-ax1.set_title(f'$f(x) = ({best_fit[0].round(2)}) + ({best_fit[1].round(2)})x$')
+ax1.set_title(f'$f(x) = ({best_fit[0].round(2)} \pm {uncertainties[0].round(2)}) + ({best_fit[1].round(2)} \pm {uncertainties[1].round(2)})x$')
 
 
 plt.show()

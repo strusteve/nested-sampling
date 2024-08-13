@@ -26,7 +26,7 @@ Input: data with errors on y, generative function, number of samples, lower prio
 Notes:
 - Returns bayesian evidence as well as posterior samples
 - In sampling a likelihood-bounded prior, uses uniform priors (explicitly) and symmetric proposal distributions in a Metropolis algorithm
-- Uses variable stepsizes in a self-contained metropolis algorithm
+- Uses variable stepsizes in a self-contained Metropolis algorithm
 
 Refinements to be made:
 - Outlier model for the likelihood function (introduces three new parameters $P_b, Y_b, V_b$ and a lot of underflow/overflow errors)

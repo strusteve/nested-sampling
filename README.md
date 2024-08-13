@@ -29,6 +29,7 @@ Notes:
 - Uses variable stepsizes in a self-contained Metropolis algorithm
 
 Refinements to be made:
+- Estimate the MAP values and parameter uncertainties better
 - Outlier model for the likelihood function (introduces three new parameters $P_b, Y_b, V_b$ and a lot of underflow/overflow errors)
-- Return evidence error
+- Return evidence uncertainty
 - Return local evidences

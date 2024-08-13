@@ -102,7 +102,7 @@ def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, 
 
     return chain[-1], accepted, rejected
 
-# Run a nested sampling algorithm (Skilling 2004)
+# Run a nested sampling algorithm (Skilling 2004, Feroz 2008)
 def nested_sampling(data, N, prior_low, prior_high, scale):
 
     # Sample 'successive prior ratios' distribution

@@ -61,7 +61,7 @@ def sample_prob_t(N, samps, stepsize):
 
     return chain.flatten()
 
-# Sample a likelihood bounded prior via the metropolis algorithm
+# Sample a likelihood bounded prior via the metropolis algorithm (Feroz 2008 Section 6)
 def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, scale):
 
     likelier_point = sorted_prior_samples[1:][np.random.randint(0, N-1)]

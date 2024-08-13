@@ -44,7 +44,7 @@ def metropolis_hastings(data, guess, stepsizes, N, scale):
         #Get likelihood for proposed step
         new_l = log_likelihood(data, new_params, scale)
 
-        #Calculate acceptance ratio
+        #Calculate acceptance ratio (NB symmetric proposal distributions)
         log_prob_ratio = new_l - current_l
 
         # Generate random number from 0-1

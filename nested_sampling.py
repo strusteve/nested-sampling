@@ -1,23 +1,23 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Generative function to be fit
-def f(x, par):
-    y = par[0] + (par[1]*x)
-    return(y)
-
 # Objective function via a likelihood distribution
-def log_likelihood(data,  params, scale):
+def log_likelihood(data, gen_func,  params, scale):
 
     # Given Data
     xi, yi, yisig = data[0], data[1], data[2]
 
-
     # Likelihood of belonging to the 'good' gaussian
-    li_good = scale * (1/(np.sqrt(2*np.pi*(yisig**2)))) * np.exp((-(yi - f(xi, params))**2) / (2*(yisig**2)))
+    '''
+    li_good = scale * (1/(np.sqrt(2*np.pi*(yisig**2)))) * np.exp((-(yi - gen_func(xi, params))**2) / (2*(yisig**2)))
     log_li = np.log(li_good)
+
+    The above produces underflow errors but will eventually have to be reconsidered when using the outlier model
+    '''
+    li_good = np.log(scale * (1/(np.sqrt(2*np.pi*(yisig**2))))) + ((-(yi - gen_func(xi, params))**2) / (2*(yisig**2)))
+
     # Sum likelihood and take logarithm (note sometimes recieve underflow error due to small likelihoods)
-    log_l_total = np.sum(log_li)
+    log_l_total = np.sum(li_good)
     
     return(log_l_total)
 
@@ -60,7 +60,7 @@ def sample_prob_t(N, samps, stepsize):
     return chain.flatten()
 
 # Sample a likelihood bounded prior via the metropolis algorithm (adapted from Feroz 2008 Section 6)
-def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, scale):
+def metropolis_prior_sampling(data, gen_func, sorted_prior_samples, sorted_likelihoods, sigmas, scale):
 
     likelier_point = sorted_prior_samples[1:][np.random.randint(0, N-1)]
 
@@ -75,7 +75,7 @@ def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, 
         trial_point = np.zeros(len(current_point))
         for j in range(len(trial_point)):
             trial_point[j] = np.random.normal(current_point[j], sigmas[j])
-        trial_likelihood = log_likelihood(data, trial_point, scale)
+        trial_likelihood = log_likelihood(data, gen_func, trial_point, scale)
 
         #Calculate prior ratio (NB uniform priors)
         prior_ratio = 1 #Included here for completeness
@@ -99,16 +99,15 @@ def metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, 
 
     return chain[-1], accepted, rejected
 
-
 # Run a nested sampling algorithm (Skilling 2004, Feroz 2008)
-def nested_sampling(data, N, prior_low, prior_high, scale):
+def nested_sampling_algorithm(data, gen_func, N, prior_low, prior_high, scale):
 
     # Sample 'successive prior ratios' distribution
     samps=100000
     chain_t = sample_prob_t(N, samps, 0.01)
 
     # Variables
-    sigmas = np.array(([1, 1]))
+    sigmas = np.ones(len(prior_high))
 
     # Memory
     like_layers = np.array(())
@@ -130,7 +129,7 @@ def nested_sampling(data, N, prior_low, prior_high, scale):
     # Evaluate the likelihood for each sample
     log_likes = np.array(())
     for j in range(N):
-        log_like = log_likelihood(data, prior_samples[j], scale)
+        log_like = log_likelihood(data, gen_func, prior_samples[j], scale)
         log_likes = np.append(log_likes, log_like)
 
     # Sort samples in order of their likelihoods
@@ -147,8 +146,8 @@ def nested_sampling(data, N, prior_low, prior_high, scale):
         '''
 
         # Replace the lowest-likelihood point with another from bounded prior via metropolis algorithm
-        new_point, accepted, rejected = metropolis_prior_sampling(sorted_prior_samples, sorted_likelihoods, sigmas, scale)
-        new_likelihood = log_likelihood(data, new_point, scale)
+        new_point, accepted, rejected = metropolis_prior_sampling(data, gen_func, sorted_prior_samples, sorted_likelihoods, sigmas, scale)
+        new_likelihood = log_likelihood(data, gen_func, new_point, scale)
 
         sorted_prior_samples[0] = new_point
         sorted_likelihoods[0] = new_likelihood
@@ -186,6 +185,45 @@ def nested_sampling(data, N, prior_low, prior_high, scale):
             # Return the posterior
             return np.array((discarded_points)), like_layers, evidence_layers, prior_volumes
 
+# Simple function for running the algorithm and plotting
+def run_nested_sampling(data, gen_func, N, prior_low, prior_high, scale):
+
+    # Run the nested sampling algorithm
+    samples, likelihood, evidence, priors = nested_sampling_algorithm(data, gen_func, N, prior_low, prior_high, scale)
+
+    # Compute the posterior and best fit model (MAP values)
+    posterior = evidence / np.sum(evidence)
+    best_fit = samples[np.argmax(posterior)]
+    uncertainties = samples.T.std(1)
+
+
+    # Plot results
+    fig, (ax, ax1) = plt.subplots(1, 2, figsize=(10,3))
+    ax.plot(np.log(priors), likelihood, color='black')
+    ax.set_xlabel('log(Enclosed Prior Volume)')
+    ax.set_ylabel('log(Lower Likelihood Bound)')
+    ax1.scatter(data[0], data[1], s=1, c='black')
+    ax1.errorbar(data[0], data[1], data[2], ls='none', lw=1, color='black')
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('y')
+    xtest = np.linspace(0,10,100)
+    ytest = gen_func(xtest, best_fit)
+    ax1.plot(xtest, ytest, color='red')
+
+    title = ' f(x) = '
+    for i in range(len(best_fit)):
+        title += f'$({best_fit[i].round(2)} \pm {uncertainties[i].round(2)})x^{i}$ '
+
+        if i != len(best_fit)-1:
+            title += '+'
+    
+
+    ax1.set_title(title)
+    
+
+
+    plt.show()
+
 
 '''
 
@@ -198,38 +236,29 @@ scale = direct multiplication with each point's likelihood (to avoid underflow/o
 
 '''
 
+# Linear function to be fit
+def linear_f(x, par):
+    y = par[0] + (par[1]*x)
+    return(y)
+
 N = 10000
 prior_low = [0, 0]
 prior_high = [10, 10]
 scale=100
+data_linear = np.genfromtxt('data_linear.csv', delimiter=',')
+run_nested_sampling(data_linear, linear_f, N, prior_low, prior_high, scale)
 
-##################################################
+###################################################################
 
-data = np.genfromtxt('data_linear.csv', delimiter=',')
+# Quadratic function to be fit
+def quad_f(x, par):
+    y = par[0] + (par[1]*x) + (par[2]*(x**2))
+    return(y)
 
-# Run the nested sampling algorithm
-samples, likelihood, evidence, priors = nested_sampling(data, N, prior_low, prior_high, scale)
-
-# Compute the posterior and best fit model (MAP values)
-posterior = evidence / np.sum(evidence)
-best_fit = samples[np.argmax(posterior)]
-uncertainties = samples.T.std(1)
-
-
-# Plot results
-fig, (ax, ax1) = plt.subplots(1, 2, figsize=(10,3))
-ax.plot(np.log(priors), likelihood, color='black')
-ax.set_xlabel('log(Enclosed Prior Volume)')
-ax.set_ylabel('log(Lower Likelihood Bound)')
-ax1.scatter(data[0], data[1], s=1, c='black')
-ax1.errorbar(data[0], data[1], data[2], ls='none', lw=1, color='black')
-ax1.set_xlabel('x')
-ax1.set_ylabel('y')
-xtest = np.linspace(0,10,100)
-ytest = best_fit[0] + (best_fit[1]*xtest)
-ax1.plot(xtest, ytest, color='red')
-ax1.set_title(f'$f(x) = ({best_fit[0].round(2)} \pm {uncertainties[0].round(2)}) + ({best_fit[1].round(2)} \pm {uncertainties[1].round(2)})x$')
-
-
-plt.show()
+N = 10000
+prior_low = [0, 0, -5]
+prior_high = [10, 10, 5]
+scale=100
+data_quad = np.genfromtxt('data_quad.csv', delimiter=',')
+run_nested_sampling(data_quad, quad_f, N, prior_low, prior_high, scale)
 

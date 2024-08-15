@@ -113,7 +113,7 @@ def nested_sampling_algorithm(data, gen_func, N, prior_low, prior_high, scale):
     like_layers = np.array(())
     prior_volumes = np.array(([1]))
     evidence_layers = np.array(([0]))
-    discarded_points = []
+    discarded_points = np.array(())
 
     ################################################# 
 
@@ -136,7 +136,7 @@ def nested_sampling_algorithm(data, gen_func, N, prior_low, prior_high, scale):
     sorted_likelihoods = log_likes[np.argsort(log_likes)]
     like_layers = np.append(like_layers, sorted_likelihoods[0])
     sorted_prior_samples = prior_samples[np.argsort(log_likes)]
-    discarded_points.append(sorted_prior_samples[0])
+    discarded_points = np.append(discarded_points, sorted_prior_samples[0])
 
     # Loop over nested liklihood layers
     while True:
@@ -156,7 +156,7 @@ def nested_sampling_algorithm(data, gen_func, N, prior_low, prior_high, scale):
         sorted_likelihoods = sorted_likelihoods[np.argsort(sorted_likelihoods)]
 
         like_layers = np.append(like_layers, sorted_likelihoods[0])
-        discarded_points.append(sorted_prior_samples[0])
+        discarded_points = np.vstack((discarded_points, sorted_prior_samples[0]))
 
         
         # Update metropolis stepsizes for bounded prior sampling

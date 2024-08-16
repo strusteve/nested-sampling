@@ -1,9 +1,15 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import corner
 
 
 class metropolis_hastings(object):
+    """ Obtain Markov-Chain via a Metropolis Hastings algorithm.
+
+    Parameters
+    ----------
+
+    logprob : function
+        Function which returns the natural logarithm of the posterior probability. Takes an array of generative model parameters as input.
+    """
 
 
     def __init__(self, logprob):
@@ -13,6 +19,21 @@ class metropolis_hastings(object):
 
     # Metropolis-hastings MCMC algorithm - returns Markov chain
     def getchain(self, N, guess, stepsizes):
+        """
+        Run the sampler and return a chain of samples.
+
+        Paramters
+        ---------
+
+        N : integer
+            Number of algorithm iterations.
+
+        guess : numpy.ndarray
+            Starting point in parameter space for MH algorithm.
+
+        stepsizes : numpy.ndarray
+            Width of the gaussian proposal distributions. Higher values cause the sampler to traverse larger distances in parameter space. 
+        """
 
         # Markov Chain
         self.chain = np.zeros((N, len(guess)))

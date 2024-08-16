@@ -161,5 +161,5 @@ class mh_examples(object):
 
 
 examples = mh_examples()
-examples.linear_example(1000000, [0,0], [1,1])
-examples.quadratic_example(int(5e6), [0,0,0], [1,1,1])
+examples.linear_example(int(1e6), [0,0], [1,1])
+examples.quadratic_example(int(1e7), [0,0,0], [1,1,1])

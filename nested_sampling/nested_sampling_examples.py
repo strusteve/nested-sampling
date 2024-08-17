@@ -25,6 +25,9 @@ class nested_examples(object):
         gen_func : function
             Generative function used to model the data.
 
+        scale : float
+            Direct multiplication of the likelihood to help with underflow/overflow errors
+
         params : numpy.ndarray
             Free parameters of the generative model.
         """
@@ -75,19 +78,19 @@ class nested_examples(object):
         return(y)
 
     def linear_example(self, N, prior_low, prior_high, scale):
-        """ Run MH algorithm on linear dataset and plot results.
+        """ Run nested sampling algorithm on a linear dataset and plot results.
 
         Parameters
         ----------
 
         N : integer
-            Number of algorithm iterations.
+            Number of samples.
 
-        guess : numpy.ndarray
-            Starting point in parameter space for MH algorithm.
+        prior_low : numpy.ndarray
+            Array of lower bounds for each parameter's uniform prior distribution.
 
-        stepsizes : numpy.ndarray
-            Width of the gaussian proposal distributions. Higher values cause the sampler to traverse larger distances in parameter space.
+        prior_high : numpy.ndarray
+            Array of upper bounds for each parameter's uniform prior distribution.
         
         """
 
@@ -128,13 +131,13 @@ class nested_examples(object):
         ----------
 
         N : integer
-            Number of algorithm iterations.
+            Number of samples.
 
-        guess : numpy.ndarray
-            Starting point in parameter space for MH algorithm.
+        prior_low : numpy.ndarray
+            Array of lower bounds for each parameter's uniform prior distribution.
 
-        stepsizes : numpy.ndarray
-            Width of the gaussian proposal distributions. Higher values cause the sampler to traverse larger distances in parameter space.
+        prior_high : numpy.ndarray
+            Array of upper bounds for each parameter's uniform prior distribution.
         
         """
 
@@ -173,6 +176,6 @@ N = 10000
 scale=100
 
 examples = nested_examples()
-#examples.linear_example(N, [0, 0], [10, 10], scale)
+examples.linear_example(N, [0, 0], [10, 10], scale)
 examples.quadratic_example(N, [0, 0, -5], [10, 10, 5], scale)
 

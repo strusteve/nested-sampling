@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import corner
 from mh_sampler import metropolis_hastings
 
 
@@ -23,7 +21,6 @@ class nested_sampler(object):
         self.ext_logprob = logprob
         self.N = N
         
-
     def prob_t(self, t):
         """ The probability distribution for the largest of N samples drawn uniformly from the interval [0, 1].
 
@@ -64,7 +61,6 @@ class nested_sampler(object):
         mcmc = metropolis_hastings(self.prob_t)
         self.chain_t = mcmc.getchain(samps, [0.5], sigma).flatten()
         
-
     def metropolis_prior_sampling(self, sorted_prior_samples, lowest_loglikelihood, sigmas):
         """ Sampler for a 'likelihood-bounded' prior. Adapted from Feroz 2008.
 

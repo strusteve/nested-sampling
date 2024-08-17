@@ -91,6 +91,11 @@ class nested_examples(object):
 
         prior_high : numpy.ndarray
             Array of upper bounds for each parameter's uniform prior distribution.
+
+        
+        scale : float
+            Direct multiplication of the likelihood to help with underflow/overflow errors
+
         
         """
 
@@ -139,6 +144,10 @@ class nested_examples(object):
         prior_high : numpy.ndarray
             Array of upper bounds for each parameter's uniform prior distribution.
         
+
+        scale : float
+            Direct multiplication of the likelihood to help with underflow/overflow errors
+
         """
 
         # Run nested sampling algorithm

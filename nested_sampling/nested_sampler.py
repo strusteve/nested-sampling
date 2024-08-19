@@ -153,7 +153,7 @@ class nested_sampler(object):
         sigmas = np.ones(len(prior_high))
         loglike_layers = np.array(())
         prior_volumes = np.array(())
-        evidence_layers = np.array(())
+        log_evidence_layers = np.array(())
         discarded_points = np.array(())
 
         ################################################# 
@@ -181,7 +181,7 @@ class nested_sampler(object):
         prior_volumes = np.append(prior_volumes, 1)
 
         # Set the initial accumulated evidence
-        evidence_layers = np.append(evidence_layers, 0)
+        log_evidence_layers = np.append(log_evidence_layers, -np.inf)
         
 
         """ loop through nested layers """
@@ -211,16 +211,17 @@ class nested_sampler(object):
 
             # Accumulate evidence
             weight = prior_volumes[-2] - prior_volumes[-1]
-            lowest_like = np.exp(sorted_loglikes[0])
-            evidence_contrib = lowest_like * weight
-            evidence_layers = np.append(evidence_layers, evidence_contrib)
+            log_evidence_contrib = sorted_loglikes[0] + np.log(weight)
+            log_evidence_layers = np.append(log_evidence_layers, log_evidence_contrib)
 
             # Stopping criterion
-            max_contrib = np.exp(sorted_loglikes[-1]) * weight
-            log_max_contrib_ratio = np.log(max_contrib) - np.log(np.sum(evidence_layers))
+            log_max_contrib = sorted_loglikes[-1] + np.log(weight)
+            log_max_contrib_ratio = log_max_contrib - np.log(np.sum(np.exp(log_evidence_layers)))
+
             print(f'Remaining log-evidence: {log_max_contrib_ratio}')
             if log_max_contrib_ratio < 0.1:
-                return discarded_points, loglike_layers, evidence_layers, prior_volumes
+                return discarded_points, loglike_layers, log_evidence_layers, prior_volumes
+
 
 
 

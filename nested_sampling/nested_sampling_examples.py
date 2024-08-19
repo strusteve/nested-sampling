@@ -36,8 +36,8 @@ class nested_examples(object):
         xi, yi, yisig = data[0], data[1], data[2]
 
         # Likelihood of belonging to the 'good' gaussian
-        li = scale * (1/(np.sqrt(2*np.pi*(yisig**2)))) * np.exp((-(yi - gen_func(xi, params))**2) / (2*(yisig**2)))
-        log_li = np.log(li)
+        #log_li = np.log(scale * (1/(np.sqrt(2*np.pi*(yisig**2)))) * np.exp((-(yi - gen_func(xi, params))**2) / (2*(yisig**2))))
+        log_li = np.log(scale * (1/(np.sqrt(2*np.pi*(yisig**2))))) + ((-(yi - gen_func(xi, params))**2) / (2*(yisig**2)))
 
 
         # Sum likelihood and take logarithm (note sometimes recieve underflow error due to small likelihoods)

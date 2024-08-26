@@ -27,6 +27,6 @@ Notes:
 - In sampling a likelihood-bounded prior, uses uniform priors (explicitly) and symmetric proposal distributions in a Metropolis algorithm.
 - Uses variable stepsizes in a self-contained Metropolis algorithm.
 
-Refinements to be made:
+Refinements:
 - Improve memory efficiency
 

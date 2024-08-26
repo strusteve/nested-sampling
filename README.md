@@ -1,6 +1,6 @@
 # Summer coding challenge
  
-Fit functions to data using:<br /><br /> (1) A Monte-Carlo Markov Chain, specifically the Metropolis-Hastings algorithm<br /> (2) A nested-sampling algorithm (Skilling 2004, Feroz 2008)
+Fit functions to data using:<br /><br /> (1) A Monte-Carlo Markov Chain, specifically the Metropolis-Hastings algorithm<br /> (2) A Nested-Sampling algorithm (Skilling 2004, Feroz 2008)
 
 
 ### Metropolis-Hastings

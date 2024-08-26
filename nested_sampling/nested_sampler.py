@@ -153,10 +153,11 @@ class nested_sampler(object):
         
         """
         
+        # Calculate posterior weights (Feroz 2008 Eq 9)
         posterior_weights = np.exp(log_evidence_layers - scp.special.logsumexp(log_evidence_layers))
 
+        # Sample equally-weighted posterior
         idx = np.random.choice(len(discarded_points), size = len(discarded_points),  p = posterior_weights)
-
         posterior_samples = discarded_points[idx, :]
 
         return posterior_samples

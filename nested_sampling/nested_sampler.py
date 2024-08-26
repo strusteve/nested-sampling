@@ -20,6 +20,12 @@ class nested_sampler(object):
     log_evidence_tol: Float
         Sets the algorithm to stop when the natural logarithm of the ratio between the remaining evidence and the accumulated evidence
         is below this number.
+
+    Returns
+    -------
+
+    posterior_samples: numpy.ndarray
+        Array of equally-weighted posterior samples.
     """
 
     def __init__(self, N, logprob, log_evidence_tol):

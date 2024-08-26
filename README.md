@@ -18,7 +18,7 @@ Refinements:
 
 ### Nested Sampling
 
-Summary: Starts from N positions in parameter space, replaces the lowest likelihood position with a higher likelihood position sampled from a likelihood-bounded prior. This process iterates, accumulating bayesian evidence at each 'layer' until only a negligible amount is left. From the discarded positions posterior samples can be drawn and inferences made.
+Summary: Starts from N positions in parameter space, replaces the lowest likelihood position with a higher likelihood position sampled from a likelihood-bounded prior. This process iterates, accumulating bayesian evidence at each 'layer' until only a negligible amount is left. From the discarded positions posterior samples can be drawn weighted by their evidence contribution and inferences made.
 
 Input: likelihood function, number of samples, lower prior bounds, upper prior bounds, tolerance
 

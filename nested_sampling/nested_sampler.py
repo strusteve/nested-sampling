@@ -1,5 +1,7 @@
 import numpy as np
+import scipy as scp
 from mh_sampler import metropolis_hastings
+import matplotlib.pyplot as plt
 
 
 class nested_sampler(object):
@@ -14,12 +16,17 @@ class nested_sampler(object):
 
     N : integer
         Number of samples drawn from the uniform distribution.
+
+    log_evidence_tol: Float
+        Sets the algorithm to stop when the natural logarithm of the ratio between the remaining evidence and the accumulated evidence
+        is below this number.
     """
 
-    def __init__(self, N, logprob):
+    def __init__(self, N, logprob, log_evidence_tol):
 
         self.ext_logprob = logprob
         self.N = N
+        self.user_log_evidence_tol = log_evidence_tol
         
     def prob_t(self, t):
         """ The probability distribution for the largest of N samples drawn uniformly from the interval [0, 1].
@@ -132,6 +139,29 @@ class nested_sampler(object):
 
         return chain[-1], accepted, rejected
 
+    def get_weighted_posterior(self, discarded_points, log_evidence_layers):
+        """ Sample equally weighted posterior.
+
+        Parameters
+        ----------
+
+        discarded_points : numpy.ndarray
+            Array of the discarded points from the nested sampling algorithm.
+
+        log_evidence_layers : numpy.ndarray
+            Array of the natural logarithm of the accumulated evidence at each layer.
+        
+        """
+        
+        posterior_weights = np.exp(log_evidence_layers - scp.special.logsumexp(log_evidence_layers))
+
+        idx = np.random.choice(len(discarded_points), size = len(discarded_points),  p = posterior_weights)
+
+        posterior_samples = discarded_points[idx, :]
+
+        return posterior_samples
+
+
     def run_sampler(self, prior_low, prior_high):
         """ Nested sampling routine.
 
@@ -181,7 +211,7 @@ class nested_sampler(object):
         prior_volumes = np.append(prior_volumes, 1)
 
         # Set the initial accumulated evidence
-        log_evidence_layers = np.append(log_evidence_layers, -np.inf)
+        log_evidence_layers = np.append(log_evidence_layers, -1e99)
         
 
         """ loop through nested layers """
@@ -214,13 +244,15 @@ class nested_sampler(object):
             log_evidence_contrib = sorted_loglikes[0] + np.log(weight)
             log_evidence_layers = np.append(log_evidence_layers, log_evidence_contrib)
 
-            # Stopping criterion
-            log_max_contrib = sorted_loglikes[-1] + np.log(weight)
-            log_max_contrib_ratio = log_max_contrib - np.log(np.sum(np.exp(log_evidence_layers)))
+            # Stopping criterion (Feroz 2008)
+            log_max_contrib = sorted_loglikes[-1] + np.log(prior_volumes[-1])
+            log_evidence = scp.special.logsumexp(log_evidence_layers)
 
-            print(f'Remaining log-evidence: {log_max_contrib_ratio}')
-            if log_max_contrib_ratio < 0.1:
-                return discarded_points, loglike_layers, log_evidence_layers, prior_volumes
+            print(f'Log Remaining Evidence Ratio: {log_max_contrib - log_evidence}')
+
+            if log_max_contrib - log_evidence < self.user_log_evidence_tol:
+                posterior_samples = self.get_weighted_posterior(discarded_points, log_evidence_layers)
+                return posterior_samples
 
 
 

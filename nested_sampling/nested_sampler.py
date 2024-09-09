@@ -203,10 +203,10 @@ class nested_sampler(object):
             prior_samples.T[i] = np.random.uniform(prior_low[i], prior_high[i], self.N)
 
         # Evaluate the likelihood for each sample (try to get rid of for loop)
-        loglikes = np.array(())
+        loglikes = np.zeros(self.N)
         for j in range(self.N):
             loglike = self.ext_logprob(prior_samples[j])
-            loglikes = np.append(loglikes, loglike)
+            loglikes[j] = loglike
 
         # Sort samples in order of their likelihoods
         sorted_loglikes = loglikes[np.argsort(loglikes)]

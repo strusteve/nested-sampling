@@ -255,7 +255,7 @@ class nested_sampler(object):
             log_max_contrib = sorted_loglikes[-1] + np.log(prior_volumes[-1])
             log_evidence = scp.special.logsumexp(log_evidence_layers)
 
-            print(f'Log Remaining Evidence Ratio: {log_max_contrib - log_evidence}')
+            #print(f'Log Remaining Evidence Ratio: {log_max_contrib - log_evidence}')
 
             if log_max_contrib - log_evidence < self.user_log_evidence_tol:
                 posterior_samples = self.get_weighted_posterior(discarded_points, log_evidence_layers)

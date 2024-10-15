@@ -66,6 +66,6 @@ class metropolis_hastings(object):
                 self.chain[i+1] = current_params
 
         # Print acceptance ratio for optimisation of stepsizes
-        print('Acceptance rate = ' + str((accepted/N)*100) + '%')
+        #print('Acceptance rate = ' + str((accepted/N)*100) + '%')
 
         return(self.chain)
